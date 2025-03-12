@@ -3,7 +3,7 @@ import LandingPageNavbar from "./_components/landingPageNavbar";
 
 const Layout = (props: PropsWithChildren) => {
   return (
-    <div>
+    <div className="w-[99vw]">
       <LandingPageNavbar />
       {props.children}
     </div>
