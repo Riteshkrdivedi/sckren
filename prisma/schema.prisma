@@ -10,6 +10,7 @@ generator client {
 model User {
   id        String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
   email     String   @unique
+  studio    Media?
   firstname String?
   lastname  String?
   image     String
@@ -17,9 +18,38 @@ model User {
   clerkId   String   @unique
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
+  WorkSpace WorkSpace[]
 }
 
+enum PRESET{
+  SD
+  HD
+}
 
 model Media{
   id String @id  @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+
+  screen   String?
+  mic      String?
+  camera   String?
+  preset   PRESET @default(SD)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  User     User? @relation(fields:[userId],references:[id])
+  userId    String? @unique @db.Uuid
+
+}
+enum Type{
+  PERSONAL 
+  PUBLIC
+}
+model WorkSpace{
+  id        String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  name      String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  type     Type
+  userId    String   @db.Uuid
+  User      User     @relation(fields: [userId], references: [id])
+  
 }
