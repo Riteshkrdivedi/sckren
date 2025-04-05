@@ -30,7 +30,6 @@ const LandingPageNavbar = () => {
         </Link>
         <Link href="/auth/sign-up">
           <Button>
-            {" "}
             <User /> Register
           </Button>
         </Link>
