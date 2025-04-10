@@ -3,6 +3,8 @@ import { Inter } from "next/font/google";
 import "./globals.css";
 import { ClerkProvider } from "@clerk/nextjs";
 import { ThemeProvider } from "next-themes";
+
+import ReactQueryProvider from "@/react-query";
 // const geistSans = Geist({
 //   variable: "--font-geist-sans",
 //   subsets: ["latin"],
@@ -25,10 +27,15 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <ClerkProvider>
+    <ClerkProvider
+      afterSignInUrl="/auth/callback"
+      afterSignUpUrl="/auth/callback"
+    >
       <html lang="en" suppressHydrationWarning>
         <body className={inter.className}>
-          <ThemeProvider>{children}</ThemeProvider>
+          <ThemeProvider>
+            <ReactQueryProvider>{children}</ReactQueryProvider>
+          </ThemeProvider>
         </body>
       </html>
     </ClerkProvider>

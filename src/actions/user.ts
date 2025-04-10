@@ -4,11 +4,19 @@ import { currentUser } from "@clerk/nextjs/server";
 
 export const onAuthenticateUser = async () => {
   try {
+    console.log("Starting authentication process");
     const user = await currentUser();
+    console.log(
+      "Current user from Clerk:",
+      user ? "User found" : "No user found"
+    );
+
     if (!user) {
+      console.log("No user found, returning 403");
       return { status: 403 };
     }
 
+    console.log("Looking for existing user in database");
     const existingUser = await client.user.findUnique({
       where: {
         clerkid: user.id,
@@ -23,9 +31,13 @@ export const onAuthenticateUser = async () => {
         },
       },
     });
+
     if (existingUser) {
+      console.log("Existing user found, returning 200");
       return { status: 200, user: existingUser };
     }
+
+    console.log("Creating new user in database");
     const newUser = await client.user.create({
       data: {
         clerkid: user.id,
@@ -61,11 +73,16 @@ export const onAuthenticateUser = async () => {
         },
       },
     });
+
     if (newUser) {
+      console.log("New user created, returning 201");
       return { status: 201, user: newUser };
     }
+
+    console.log("Failed to create user, returning 400");
     return { status: 400 };
   } catch (error) {
+    console.error("Error in authentication:", error);
     return { status: 500 };
   }
 };

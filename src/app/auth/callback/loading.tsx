@@ -7,7 +7,6 @@ const Loading = (props: Props) => {
   return (
     <div className="flex h-screen w-full justify-center items-center">
       <Spinner />
-      loadinngggggggggggggggggg
     </div>
   );
 };

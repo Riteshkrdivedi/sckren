@@ -8,13 +8,13 @@ const Dashboard = async (props: Props) => {
   try {
     const auth = await onAuthenticateUser();
     if (auth.status === 200 || auth.status === 201) {
-      redirect_path = `/dashboard/${auth.user?.workspace[0].id}`;
       console.log("i am in dashboard");
+      redirect_path = `/dashboard/${auth.user?.workspace[0].id}`;
       return redirect(`/dashboard/${auth.user?.workspace[0].id}`);
     }
 
     if (auth.status === 400 || auth.status === 500 || auth.status === 404) {
-      console.log("i am  noottttt in dashboard");
+      // console.log("i am  noottttt in dashboard");
       redirect_path = "/auth/sign-in";
     }
   } catch (error) {
