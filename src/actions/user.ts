@@ -16,8 +16,9 @@ export const onAuthenticateUser = async () => {
       return { status: 403 };
     }
 
-    console.log("Looking for existing user in database");
-    const existingUser = await client.user.findUnique({
+    // 1. Try to find user by clerkid
+    console.log("Looking for existing user in database by clerkid");
+    let existingUser = await client.user.findUnique({
       where: {
         clerkid: user.id,
       },
@@ -33,15 +34,55 @@ export const onAuthenticateUser = async () => {
     });
 
     if (existingUser) {
-      console.log("Existing user found, returning 200");
+      console.log("Existing user found by clerkid, returning 200");
       return { status: 200, user: existingUser };
     }
 
+    // 2. If not found, try to find user by email
+    const userEmail = user.emailAddresses[0].emailAddress;
+    console.log("Looking for existing user in database by email");
+    const userByEmail = await client.user.findUnique({
+      where: {
+        email: userEmail,
+      },
+      include: {
+        workspace: true,
+        subscription: {
+          select: {
+            plan: true,
+          },
+        },
+      },
+    });
+
+    if (userByEmail) {
+      // Optionally update clerkid if it's not set or different
+      if (userByEmail.clerkid !== user.id) {
+        console.log("Updating existing user's clerkid to match Clerk user");
+        const updatedUser = await client.user.update({
+          where: { email: userEmail },
+          data: { clerkid: user.id },
+          include: {
+            workspace: true,
+            subscription: {
+              select: {
+                plan: true,
+              },
+            },
+          },
+        });
+        return { status: 200, user: updatedUser };
+      }
+      console.log("Existing user found by email, returning 200");
+      return { status: 200, user: userByEmail };
+    }
+
+    // 3. If not found by email, create new user
     console.log("Creating new user in database");
     const newUser = await client.user.create({
       data: {
         clerkid: user.id,
-        email: user.emailAddresses[0].emailAddress,
+        email: userEmail,
         firstname: user.firstName,
         lastname: user.lastName,
         image: user.imageUrl,
